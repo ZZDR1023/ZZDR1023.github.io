@@ -100,3 +100,91 @@ int main()
 
     return 0;
 }*/
+
+/*字符串和字符数组
+ C语⾔中有字符类型，但是没有字符串类型，C语⾔中 字符串 就是由双引号引起来的⼀串字符，⽐
+如："abcdef";
+⼀个字符串中我们直观的能看到⼀些字符，⽐如：字符串常量 "abcdef" 中，我们看到了 a、b、c、
+d、e、f 这6个字符，但是实际上在末尾还隐藏⼀个 '\0' 的转义字符， '\0' 是作为字符串的结束标志存在的。
+正因为字符串中隐藏⼀个'\0'字符，是字符串的结束标志，所以我们在使⽤库函数打印字符串
+（printf）或者计算字符串⻓度(strlen) 的时候，遇到 '\0' 的时候就⾃动停⽌了。
+其实字符串和字符数组是⾮常类似的，字符串在内存中存储的时候，也是连续存放的，就像数组⼀样。*/
+/*字符数组的创建和初始化字符数组就⼀个存放字符的数组，创建形式如下：*/
+
+/*#include <stdio.h>
+
+int main()
+{
+    //"abcdef";//常量字符串
+    // char 类型的数组中
+
+    char arr1[5] = {'a', 'b', 'c', 'd', 'e'}; // 初始化
+ //=char arr1[5] = "abcde"; //字符串常量初始化字符数组有个\0
+    //             0   1   2   3   4
+    int sz = sizeof(arr1) / sizeof(arr1[0]);
+    int i = 0;
+    for (i = 0; i < sz; i++)
+    {
+        printf("%c", arr1[i]);
+    }
+
+    return 0;
+}*/
+
+/*\0的重要性*/
+/*#include <stdio.h>
+
+int main()
+{
+    char arr1[] = {'a', 'b', 'c'}; // 可以加个‘\0'后面就没有乱码
+    char arr2[] = "abc";
+
+    printf("%s\n", arr1); // 后面有乱码，后面没有\0
+    printf("%s\n", arr2);
+
+    return 0;
+}*/
+
+/*字符数组的输⼊和输出
+我们可以使⽤scanf函数和printf函数完成字符串的输⼊和输出*/
+/*#include <stdio.h>
+
+int main()
+{
+    char arr[10] = {0};
+    // 输入操作
+    scanf("%s", arr);
+    //注：使⽤scanf函数输⼊的时候，我们⾃⼰要保证字符数组⾜够⼤，能够容纳下输⼊进去的字符
+    //，要不然就会出问题。这也是scanf被诟病不安全的地⽅。
+    // 输出操作
+    printf("%s", arr);
+
+    return 0;
+}*/
+
+/*求字符串⻓度
+在C语⾔中有⼀个库函数叫 strlen ，这个函数是专⻔⽤来求字符串⻓度的。
+ strlen 的使⽤需要包含⼀个头⽂件 string.h 。
+strlen函数统计的是字符串中 \0 之前的字符的个数，
+所以传递给strlen函数的字符串中必须得包含\0 .*/
+
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+    char str1[10] = "abcdef";
+    printf("%zd\n", strlen(str1)); // 6
+
+    char str2[10] = {'a', 'b', 'c', 'd', 'e', 'f'};
+    printf("%zd\n", strlen(str2)); // 6
+
+    char str3[] = {'a', 'b', 'c', 'd', 'e', 'f'}; // 可以主动放个'\0'
+    printf("%zd\n", strlen(str3));                // 随机值
+
+    // strlen和sizeof的对⽐
+    printf("%d\n", strlen(str1));
+    printf("%d\n", sizeof(str1));
+
+    return 0;
+}
