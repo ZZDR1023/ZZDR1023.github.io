@@ -168,7 +168,7 @@ int main()
 strlen函数统计的是字符串中 \0 之前的字符的个数，
 所以传递给strlen函数的字符串中必须得包含\0 .*/
 
-#include <stdio.h>
+/*#include <stdio.h>
 #include <string.h>
 
 int main()
@@ -187,4 +187,110 @@ int main()
     printf("%d\n", sizeof(str1));
 
     return 0;
+}*/
+
+/*gets 和 puts 函数*/
+
+/*gets*/
+/*#include <stdio.h>
+
+int main()
+{
+    char arr[20] = {0};
+    gets(arr); // 约等于scanf("%s", &arr);
+    printf("%s\n", arr);
+
+    return 0;
+}*/
+
+/*puts
+puts函数打印str指向的字符串到标准输出（⼀般指屏幕），
+同时在打印结束后会打印换⾏。*/
+
+/*#include <stdio.h>
+int main()
+{
+    char arr1[] = "abc";
+    char arr2[] = "def";
+    printf("%s", arr1); // abc
+    printf("%s", arr2); // def
+    printf("\n");       // 区分两次打印的效果
+    puts(arr1);         // abc\n
+    puts(arr2);         // def\n
+
+    return 0;
+}*/
+
+/*⾃定义函数*/
+
+/*函数的语法形式
+其实⾃定义函数和库函数是⼀样的，形式如下：
+ret_type fun_name(形式参数)
+{
+
 }
+1
+2
+3
+4
+• ret_type 是函数返回类型
+• fun_name 是函数名
+• 括号中放的是形式参数
+• {} 括起来的是函数体*/
+
+/*#include <stdio.h>
+int main()
+{
+    int a = 0;
+    int b = 0;
+    // 输⼊
+    scanf("%d %d", &a, &b);
+    // 调⽤加法函数，完成a和b的相加//求和的结果放在r中
+    //to do
+//输出
+    printf("%d\n", r);
+    return 0;
+}*/
+/*给函数取名：Add，函数Add需要接收2个整型类型的参数，函数计算的结果也是整型。*/
+
+/*#include <stdio.h>
+int Add(int x, int y)
+{
+    int z = 0;//可以简化成retrun x+y;
+    z = x + y;
+    return z;
+}
+
+int main()
+{
+    int a = 0;
+    int b = 0;
+    scanf("%d %d", &a, &b);
+    int r = Add(a, b);
+    printf("%d\n", r);
+
+    return 0;
+}*/
+
+/*判断闰年*/
+/*#include <stdio.h>
+int is_leap_year(int y)
+{
+    if (y % 4 == 0 && y % 100 != 0 || y % 400 == 0)
+        return 1;
+    else
+        return 0;
+}
+
+int main()
+{
+    int year = 0;
+    scanf("%d", &year);
+    int ret = is_leap_year(year);//函数调用
+    if (ret == 1)
+        printf("Yes\n");
+    else
+        printf("No\n");
+
+    return 0;
+}*/
