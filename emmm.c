@@ -252,9 +252,10 @@ int main()
     return 0;
 }*/
 /*给函数取名：Add，函数Add需要接收2个整型类型的参数，函数计算的结果也是整型。*/
+/*形参是实参的一份临时拷贝*/
 
 /*#include <stdio.h>
-int Add(int x, int y)
+int Add(int x, int y)//x，y是形参
 {
     int z = 0;//可以简化成retrun x+y;
     z = x + y;
@@ -266,7 +267,7 @@ int main()
     int a = 0;
     int b = 0;
     scanf("%d %d", &a, &b);
-    int r = Add(a, b);
+    int r = Add(a, b);//实参
     printf("%d\n", r);
 
     return 0;
@@ -293,4 +294,73 @@ int main()
         printf("No\n");
 
     return 0;
-}*/ /
+}*/
+
+/*⾃定义函数的设计
+ • 函数的参数
+• 函数返回值类型
+• 函数的功能• 函数的名字*/
+
+/*函数的链式访问
+所谓链式访问就是将⼀个函数的返回值作为另外⼀个函数的参数，
+像链条⼀样将函数串起来就是函数的链式访问。*/
+
+/*#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+    // size_t len = strlen("abcdef"); // 求字符串的长度a,b,c,d,e,f,\0
+    // printf("%zd\n", len);
+
+    printf("%zd\n", strlen("abcdef"));
+
+    return 0;
+}*/
+
+/*!!printf特殊应用#include <stdio.h>
+
+int main()
+{
+    printf("%d", printf("%d", printf("%d", 43)));    // 4321
+    printf("%d ", printf("%d ", printf("%d ", 43))); // 43 3 2
+
+    return 0;
+}*/
+
+/*函数的镶嵌套用
+不能嵌套定义*/
+/*!!!!!计算某年某⽉有多少天？
+如果要函数实现，可以设计2个函数:
+• is_leap_year()：根据年份确定是否是闰年
+• get_days_of_month()：调⽤is_leap_year确定是否是闰年后，再根据⽉计算这个⽉的天数*/
+
+#include <stdio.h>
+
+int is_leap_year(int y)
+{
+    if (y % 4 == 0 && y % 100 != 0 || y % 400 == 0)
+        return 0;
+    else
+        return 1;
+}
+
+int get_days_of_month(int y, int m)
+{
+    int days[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    //            0   1   2   3   4   5  对齐下标
+    int d = days[m];
+    if (is_leap_year(y) == 1 && m == 2)
+        d += 1;
+    return d;
+}
+
+int main()
+{
+    int y, m;
+    scanf("%d%d", &y, &m);
+    int d = get_days_of_month(y, m);
+    printf("%d年%d月有%d天\n", y, m, d);
+
+    return 0;
+}
