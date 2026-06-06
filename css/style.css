@@ -578,6 +578,34 @@ h3 {
   50% { transform: scale(1.35); opacity: 1; }
 }
 
+.preview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr);
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+.preview-card {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  box-shadow: 0 20px 60px oklch(8% 0.018 104 / 0.28);
+}
+
+.preview-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.preview-card figcaption {
+  padding: var(--space-md) var(--space-lg);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 .project-links {
   display: flex;
   flex-wrap: wrap;
@@ -706,7 +734,8 @@ h3 {
   }
 
   .project-stack,
-  .workflow-steps {
+  .workflow-steps,
+  .preview-grid {
     grid-template-columns: 1fr;
   }
 }
