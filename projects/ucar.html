@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="XF-ROBOT-UCAR01 智能小车项目详情：ROS、Web 控制、地图导航与 AI 辅助工程实践。">
+  <title>XF-ROBOT-UCAR01 · 项目详情</title>
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="cursor-orb" aria-hidden="true"></div>
+  <div class="page-shell detail-shell">
+    <header class="site-header is-visible" data-reveal>
+      <a class="brand" href="/">
+        <span class="brand-mark">ZH</span>
+        <span>ZZDR1023</span>
+      </a>
+      <nav class="site-nav" aria-label="项目导航">
+        <a href="/">首页</a>
+        <a href="/projects/po-scorad.html">PO-SCORAD</a>
+        <a href="/projects/cyber-infiltration.html">光球潜入</a>
+        <a href="https://github.com/ZZDR1023/ucar_web_control" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="detail-hero" data-reveal>
+        <p class="eyebrow">PROJECT 01 · ROBOTICS SYSTEM</p>
+        <h1>XF-ROBOT-UCAR01 智能小车</h1>
+        <p class="hero-lede">基于 ROS1、Python Flask、WebSocket、Cartographer、RViz 与 Linux 的智能车 Web 控制系统，将实体机器人、Web 驾驶舱、地图导航和运行日志联动起来。</p>
+        <div class="tag-row"><span>ROS1</span><span>Python Flask</span><span>WebSocket</span><span>Cartographer</span><span>RViz</span><span>Linux</span></div>
+      </section>
+
+      <section class="detail-layout section">
+        <article class="detail-main" data-reveal>
+          <h2>项目目标</h2>
+          <p>面向 XF-ROBOT-UCAR01 智能小车，构建可在浏览器中操作的控制台，完成远程驾驶、导航目标下发、状态监控、地图展示、巡逻和日志分析等功能。</p>
+
+          <h2>我的工作</h2>
+          <ul class="clean-list">
+            <li>使用 Claude Code 辅助完成 ROS/Linux 代码编写、服务部署、日志排查和联调问题定位。</li>
+            <li>开发 Web 驾驶舱，支持底盘控制、STOP、导航目标下发、AMCL 位姿展示和摄像头预览。</li>
+            <li>通过 SSH 连接实体车环境，完成服务启动、异常排查、运行验证和稳定性调整。</li>
+            <li>梳理系统联调流程，将硬件、ROS 节点、WebSocket 通信和前端交互串联成可复现流程。</li>
+          </ul>
+
+          <h2>技术难点</h2>
+          <p>项目难点不只在页面实现，而在真实硬件场景下的不确定性：ROS 节点状态、地图构建、网络通信、服务部署和传感器数据都可能影响控制台表现。因此项目重点是把日志、运行状态和操作反馈做成可排查的工程链路。</p>
+        </article>
+
+        <aside class="detail-aside" data-reveal>
+          <div class="metric-card"><span>Role</span><strong>独立开发 / 联调</strong></div>
+          <div class="metric-card"><span>Focus</span><strong>ROS + Web 控制</strong></div>
+          <div class="metric-card"><span>AI Tooling</span><strong>Claude Code</strong></div>
+          <a class="button primary" href="https://github.com/ZZDR1023/ucar_web_control" target="_blank" rel="noreferrer">查看仓库</a>
+        </aside>
+      </section>
+    </main>
+  </div>
+  <script src="/js/portfolio.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="光球潜入 AI Native 移动端体感游戏项目详情：H5 Canvas、GLM API 与 Cloudflare Serverless。">
+  <title>光球潜入 · 项目详情</title>
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="cursor-orb" aria-hidden="true"></div>
+  <div class="page-shell detail-shell">
+    <header class="site-header is-visible" data-reveal>
+      <a class="brand" href="/"><span class="brand-mark">ZH</span><span>ZZDR1023</span></a>
+      <nav class="site-nav" aria-label="项目导航">
+        <a href="/">首页</a>
+        <a href="/projects/ucar.html">智能小车</a>
+        <a href="/projects/po-scorad.html">PO-SCORAD</a>
+        <a href="https://github.com/ZZDR1023/cyber-infiltration" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="detail-hero" data-reveal>
+        <p class="eyebrow">PROJECT 03 · AI NATIVE GAME</p>
+        <h1>光球潜入：移动端体感游戏</h1>
+        <p class="hero-lede">结合 H5 Canvas、手机体感控制、GLM API 和 Cloudflare Serverless 的 Web 游戏，用 AI 生成剧情反馈和结算文案。</p>
+        <div class="tag-row"><span>H5 Canvas</span><span>JavaScript</span><span>GLM API</span><span>Cloudflare Workers</span><span>D1</span></div>
+      </section>
+
+      <section class="detail-layout section">
+        <article class="detail-main" data-reveal>
+          <h2>项目目标</h2>
+          <p>做一个在移动端可玩的体感 Web 游戏：玩家通过设备动作参与交互，系统根据表现生成个性化反馈，并支持排行榜和数据持久化。</p>
+
+          <h2>我的工作</h2>
+          <ul class="clean-list">
+            <li>使用 Claude Code 辅助完成代码实现、调试和 AI Native 开发流程。</li>
+            <li>设计 Prompt 映射逻辑，把玩家行为转化为可用于 GLM API 的输入。</li>
+            <li>接入 GLM API 生成结算文案，并配置 fallback 机制保证主流程稳定。</li>
+            <li>使用 Cloudflare Pages、Workers 和 D1 构建轻量后端、排行榜和数据持久化。</li>
+          </ul>
+
+          <h2>项目亮点</h2>
+          <p>它不是简单地把 AI 放到页面里，而是把 AI 放进玩法反馈：用户完成一次交互后，模型输出成为体验的一部分，让每次结算更像“个人化回应”。</p>
+        </article>
+
+        <aside class="detail-aside" data-reveal>
+          <div class="metric-card"><span>Role</span><strong>主力开发</strong></div>
+          <div class="metric-card"><span>Focus</span><strong>AI 反馈 + 体感交互</strong></div>
+          <div class="metric-card"><span>Backend</span><strong>Cloudflare Serverless</strong></div>
+          <a class="button primary" href="https://cyber-infiltration.pages.dev/" target="_blank" rel="noreferrer">在线体验</a>
+          <a class="button secondary" href="https://github.com/ZZDR1023/cyber-infiltration" target="_blank" rel="noreferrer">查看仓库</a>
+        </aside>
+      </section>
+    </main>
+  </div>
+  <script src="/js/portfolio.js"></script>
+</body>
+</html>
