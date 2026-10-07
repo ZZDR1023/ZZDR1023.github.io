@@ -20,7 +20,7 @@
   <div class="cursor-orb" aria-hidden="true"></div>
   <canvas id="signal-canvas" aria-hidden="true"></canvas>
   <div class="page-shell">
-    <header class="site-header" data-reveal>
+    <header class="site-header is-visible" data-reveal>
       <a class="brand" href="#top" aria-label="回到首页">
         <span class="brand-mark">ZH</span>
         <span>ZZDR1023</span>
@@ -36,7 +36,7 @@
 
     <main id="top">
       <section class="hero section-grid">
-        <div class="hero-copy" data-reveal>
+        <div class="hero-copy is-visible" data-reveal>
           <p class="eyebrow">AI APPLICATION · SERVERLESS WEB · ROBOTICS SYSTEMS</p>
           <h1>把 AI 能力接入真实业务、数据流程与机器人场景。</h1>
           <p class="hero-lede">
@@ -48,7 +48,7 @@
           </div>
         </div>
 
-        <aside class="hero-panel" data-reveal>
+        <aside class="hero-panel is-visible" data-reveal>
           <div class="panel-status">
             <span class="pulse-dot"></span>
             <span>Portfolio online</span>
@@ -225,68 +225,71 @@
   </div>
 
   <script>
-    const canvas = document.getElementById('signal-canvas');
-    const context = canvas.getContext('2d');
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let width = 0;
-    let height = 0;
-    let points = [];
+    (() => {
+      const canvas = document.getElementById('signal-canvas');
+      if (!canvas) return;
+      const context = canvas.getContext('2d');
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let width = 0;
+      let height = 0;
+      let points = [];
 
-    function resizeCanvas() {
-      const scale = window.devicePixelRatio || 1;
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width * scale;
-      canvas.height = height * scale;
-      canvas.style.width = width + 'px';
-      canvas.style.height = height + 'px';
-      context.setTransform(scale, 0, 0, scale, 0, 0);
-      points = Array.from({ length: Math.min(42, Math.floor(width / 32)) }, (_, index) => ({
-        x: (index * 97) % width,
-        y: (index * 53) % height,
-        vx: ((index % 5) - 2) * 0.12,
-        vy: (((index + 2) % 5) - 2) * 0.1
-      }));
-    }
+      function resizeCanvas() {
+        const scale = window.devicePixelRatio || 1;
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        context.setTransform(scale, 0, 0, scale, 0, 0);
+        points = Array.from({ length: Math.min(42, Math.floor(width / 32)) }, (_, index) => ({
+          x: (index * 97) % width,
+          y: (index * 53) % height,
+          vx: ((index % 5) - 2) * 0.12,
+          vy: (((index + 2) % 5) - 2) * 0.1
+        }));
+      }
 
-    function drawSignals() {
-      context.clearRect(0, 0, width, height);
-      context.fillStyle = 'rgba(190, 166, 112, 0.55)';
-      context.strokeStyle = 'rgba(120, 145, 125, 0.2)';
-      context.lineWidth = 1;
+      function drawSignals() {
+        context.clearRect(0, 0, width, height);
+        context.fillStyle = 'rgba(190, 166, 112, 0.55)';
+        context.strokeStyle = 'rgba(120, 145, 125, 0.2)';
+        context.lineWidth = 1;
 
-      points.forEach((point, index) => {
-        if (!prefersReducedMotion) {
-          point.x += point.vx;
-          point.y += point.vy;
-          if (point.x < 0 || point.x > width) point.vx *= -1;
-          if (point.y < 0 || point.y > height) point.vy *= -1;
-        }
-
-        context.beginPath();
-        context.arc(point.x, point.y, index % 3 === 0 ? 1.8 : 1.2, 0, Math.PI * 2);
-        context.fill();
-
-        for (let nextIndex = index + 1; nextIndex < points.length; nextIndex += 1) {
-          const next = points[nextIndex];
-          const distance = Math.hypot(point.x - next.x, point.y - next.y);
-          if (distance < 150) {
-            context.globalAlpha = 1 - distance / 150;
-            context.beginPath();
-            context.moveTo(point.x, point.y);
-            context.lineTo(next.x, next.y);
-            context.stroke();
-            context.globalAlpha = 1;
+        points.forEach((point, index) => {
+          if (!prefersReducedMotion) {
+            point.x += point.vx;
+            point.y += point.vy;
+            if (point.x < 0 || point.x > width) point.vx *= -1;
+            if (point.y < 0 || point.y > height) point.vy *= -1;
           }
-        }
-      });
 
-      if (!prefersReducedMotion) requestAnimationFrame(drawSignals);
-    }
+          context.beginPath();
+          context.arc(point.x, point.y, index % 3 === 0 ? 1.8 : 1.2, 0, Math.PI * 2);
+          context.fill();
 
-    resizeCanvas();
-    drawSignals();
-    window.addEventListener('resize', resizeCanvas);
+          for (let nextIndex = index + 1; nextIndex < points.length; nextIndex += 1) {
+            const next = points[nextIndex];
+            const distance = Math.hypot(point.x - next.x, point.y - next.y);
+            if (distance < 150) {
+              context.globalAlpha = 1 - distance / 150;
+              context.beginPath();
+              context.moveTo(point.x, point.y);
+              context.lineTo(next.x, next.y);
+              context.stroke();
+              context.globalAlpha = 1;
+            }
+          }
+        });
+
+        if (!prefersReducedMotion) requestAnimationFrame(drawSignals);
+      }
+
+      resizeCanvas();
+      drawSignals();
+      window.addEventListener('resize', resizeCanvas);
+    })();
   </script>
   <script src="/js/portfolio.js"></script>
 </body>
