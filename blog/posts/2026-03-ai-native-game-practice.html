@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="复盘光球潜入游戏的架构设计：GLM API、体感交互、Prompt映射与Cloudflare Serverless后端。">
+  <title>从零构建 AI Native 移动端游戏：GLM API 与 Cloudflare Serverless 的工程实践 · ZZDR1023</title>
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="cursor-orb" aria-hidden="true"></div>
+  <div class="page-shell detail-shell">
+    <header class="site-header is-visible" data-reveal>
+      <a class="brand" href="/"><span class="brand-mark">ZH</span><span>ZZDR1023</span></a>
+      <nav class="site-nav" aria-label="文章导航">
+        <a href="/">首页</a>
+        <a href="/blog/">博客</a>
+        <a href="/projects/cyber-infiltration.html">相关项目</a>
+        <a href="https://cyber-infiltration.pages.dev/" target="_blank" rel="noreferrer">游戏在线体验</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="detail-hero" data-reveal>
+        <p class="eyebrow"><a href="/blog/" style="color: inherit; text-decoration: none;">← 返回博客列表</a> · POST / AI NATIVE</p>
+        <h1>从零构建 AI Native 移动端游戏：GLM API 与 Cloudflare Serverless 的工程实践</h1>
+        <div class="article-meta" style="margin-top: 1rem;">
+          <span class="article-badge">AI Native</span>
+          <span>发布于 2026-03-20</span>
+          <span>·</span>
+          <span>预计阅读 6 分钟</span>
+          <span>·</span>
+          <span>作者：张瀚 (ZZDR1023)</span>
+        </div>
+        <div class="tag-row" style="margin-top: 1.2rem;">
+          <span>H5 Canvas</span>
+          <span>DeviceMotion API</span>
+          <span>GLM API</span>
+          <span>Cloudflare Workers</span>
+          <span>Cloudflare D1</span>
+        </div>
+      </section>
+
+      <div class="post-layout">
+        <!-- 正文主体 -->
+        <article class="post-main" data-reveal>
+          <div class="post-body">
+            <h2 id="intro">一、背景：为什么不是简单的“套壳 AI”？</h2>
+            <p>
+              在很多所谓的 AI 游戏项目中，大语言模型往往只充当一个悬浮在侧边栏的对话框或者剧情复读机，游戏核心玩法与模型处于完全割裂的状态。
+            </p>
+            <p>
+              在开发《光球潜入（Cyber Infiltration）》之初，我的目标是验证一种真正的 <strong>AI Native 交互闭环</strong>：
+              玩家在手机上通过物理体感（重力陀螺仪）操控光球躲避探测网络、收集能量核心；游戏结束时，系统不使用死板的固定模板评分，而是提取玩家的真实轨迹特征（如闪避频率、存活时长、关键决策偏好），通过 Prompt 动态注入大模型，生成带有强烈赛博朋克黑客风格的<strong>动态任务评估报告与专属剧情文案</strong>。
+            </p>
+
+            <div class="callout success">
+              <div class="callout-title">💡 核心设计理念</div>
+              <p>让大模型成为玩法结算的“裁判与叙事官”，而不是与主玩法脱节的聊天插件。</p>
+            </div>
+
+            <h2 id="architecture">二、系统总体架构</h2>
+            <p>
+              为了保证移动端极低的网络延迟和零运维成本，整个技术栈采用了现代 Serverless 方案：
+            </p>
+            <ul>
+              <li><strong>前端层 (Client)</strong>：纯原生 JavaScript + HTML5 Canvas 绘制 60fps 粒子流光效果，使用 <code>DeviceMotionEvent</code> 监听手机倾斜重力感应。</li>
+              <li><strong>托管与加速 (Hosting)</strong>：Cloudflare Pages 全球 CDN 加速，国内无需代理秒开。</li>
+              <li><strong>无服务器计算层 (Serverless Compute)</strong>：Cloudflare Workers 编写边缘计算路由，负责 API 鉴权、速率限制与 LLM 接口封装。</li>
+              <li><strong>智能决策层 (LLM Layer)</strong>：接入智谱 GLM API，根据量化指标输出结构化 JSON 结算文本。</li>
+              <li><strong>数据持久化 (Storage)</strong>：Cloudflare D1（Serverless SQL 数据库）记录全球玩家排行榜与结算记录。</li>
+            </ul>
+
+            <h2 id="prompt-engineering">三、核心难点：玩家行为特征到 Prompt 的映射</h2>
+            <p>
+              大模型无法直接理解一万帧的原始坐标轨迹数据。我们需要在客户端将物理游戏过程抽象为高信噪比的<strong>行为特征向量（Feature Vector）</strong>：
+            </p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span>javascript // 行为数据提取</span>
+                <button class="copy-btn">复制代码</button>
+              </div>
+              <pre><code>// 结算时提取的行为特征上下文
+const sessionMetrics = {
+  durationSeconds: Math.floor(gameTime / 1000),
+  stealthRate: (stealthFrames / totalFrames * 100).toFixed(1) + "%",
+  dangerCloseCount: nearMisses,        // 极限擦弹次数
+  coreCollected: collectedCores,      // 核心收集数
+  dominantStyle: calcPlayStyle(turns, speedVariance), // 风格：激进突进型 / 稳健潜行型
+};</code></pre>
+            </div>
+
+            <p>
+              在 Worker 边缘函数中，我们将该特征注入格式受控的系统提示词（System Prompt），并要求 LLM 输出强类型的 JSON：
+            </p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span>typescript // Cloudflare Worker 结算请求</span>
+                <button class="copy-btn">复制代码</button>
+              </div>
+              <pre><code>export async function onRequestPost(context) {
+  const { metrics } = await context.request.json();
+
+  const prompt = `你是一个赛博朋克安全AI主机。根据入侵者的作战遥测数据：
+- 潜入时长: ${metrics.durationSeconds}s
+- 隐匿率: ${metrics.stealthRate}
+- 极限脱险: ${metrics.dangerCloseCount}次
+- 风格判定: ${metrics.dominantStyle}
+
+请以冷酷或赞赏的主机口吻，输出一段不超过80字的入侵评估和给予代号。
+返回严格JSON格式：{"codename": "...", "verdict": "..."}`;
+
+  // 调用 GLM API...
+}</code></pre>
+            </div>
+
+            <h2 id="fallback">四、高可用设计：Fallback 熔断降级机制</h2>
+            <p>
+              在真实网络和移动端弱网环境下，第三方大模型可能会出现偶发超时或限流（Rate Limit）。对于游戏而言，玩家在结算页绝不能看到转圈崩溃。
+            </p>
+
+            <div class="callout info">
+              <div class="callout-title">⚠️ 工程防御哲学</div>
+              <p>AI 是锦上添花的能力增强，业务主流程绝不能因为 AI 服务波动而中断。</p>
+            </div>
+
+            <p>
+              我们在 Worker 端设置了 <strong>3.5 秒严格超时控制</strong>。一旦 GLM API 超时或返回非 200，触发内置的规则引擎算法库（基于分数区间的本地赛博文案生成池），瞬间返回确定性的降级文案，同时在后台记录告警日志。这种防御设计让游戏在极端网络条件下的可用性达到了 99.9%。
+            </p>
+
+            <h2 id="summary">五、总结与未来演进</h2>
+            <p>
+              通过《光球潜入》的研发，我总结出三条关于 AI Native Web 开发的黄金法则：
+            </p>
+            <ol>
+              <li><strong>特征提纯比全量上下文更重要</strong>：精炼的行为量化指标比盲目把所有动作喂给模型更加经济且高效。</li>
+              <li><strong>边缘 Serverless 是大模型 API 的天然伴侣</strong>：Cloudflare Workers 保护了模型 API Key 不泄露，并在边缘做到了毫秒级响应。</li>
+              <li><strong>始终设计确定性降级路径</strong>：拥抱大模型的不确定性，并用确定性的工程手段兜底。</li>
+            </ol>
+            <p>
+              接下来，我计划把这套结合体感和 AI 评估的机制应用到更多硬件与 ROS 机器人远程控制项目中，期待带来更具沉浸感的交互可能。
+            </p>
+          </div>
+
+          <!-- 底部上一篇/下一篇导航 -->
+          <div class="post-footer-nav">
+            <a class="post-nav-card" href="/blog/">
+              <span class="post-nav-label">目录</span>
+              <span class="post-nav-title">← 返回所有文章列表</span>
+            </a>
+            <a class="post-nav-card" href="/blog/posts/2026-03-ai-assisted-engineering-workflow.html" style="text-align: right;">
+              <span class="post-nav-label">下一篇推荐</span>
+              <span class="post-nav-title">我的 AI 辅助研发工作流 →</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- 右侧边栏：大纲 TOC 与作者卡 -->
+        <aside class="post-sidebar" data-reveal>
+          <div class="toc-card">
+            <div class="toc-title">目录大纲 (TOC)</div>
+            <ul class="toc-list">
+              <li><a class="toc-link is-active" href="#intro">一、背景：为什么不是简单的套壳</a></li>
+              <li><a class="toc-link" href="#architecture">二、系统总体架构</a></li>
+              <li><a class="toc-link" href="#prompt-engineering">三、行为到 Prompt 的映射</a></li>
+              <li><a class="toc-link" href="#fallback">四、高可用 Fallback 降级</a></li>
+              <li><a class="toc-link" href="#summary">五、总结与未来演进</a></li>
+            </ul>
+          </div>
+
+          <div class="metric-card" style="margin: 0;">
+            <span>Author</span>
+            <strong>张瀚 / ZZDR1023</strong>
+            <p style="font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem; line-height: 1.5;">
+              关注 AI Native、Serverless 与 ROS 机器人系统。
+            </p>
+            <a class="button primary" href="https://github.com/ZZDR1023" target="_blank" rel="noreferrer" style="margin-top: 0.8rem; width: 100%; text-align: center;">Follow on GitHub</a>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer" data-reveal>
+      <p>© 2026 张瀚 / ZZDR1023 · 保持构建，保持好奇</p>
+      <div>
+        <a href="/blog/">Blog</a>
+        <a href="https://github.com/ZZDR1023" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="#">Back to top ↑</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="/js/portfolio.js"></script>
+</body>
+</html>

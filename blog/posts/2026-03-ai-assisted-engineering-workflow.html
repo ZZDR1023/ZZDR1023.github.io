@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="分享日常使用 Claude Code 与 Codex 辅助开发的工作流心法：契约优先、上下文裁剪、ROS 机器人远程排障与自动化工程实践。">
+  <title>我的 AI 辅助研发工作流：如何用 Claude Code / Codex 驱动全栈与机器人工程 · ZZDR1023</title>
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="cursor-orb" aria-hidden="true"></div>
+  <div class="page-shell detail-shell">
+    <header class="site-header is-visible" data-reveal>
+      <a class="brand" href="/"><span class="brand-mark">ZH</span><span>ZZDR1023</span></a>
+      <nav class="site-nav" aria-label="文章导航">
+        <a href="/">首页</a>
+        <a href="/blog/">博客</a>
+        <a href="/projects/ucar.html">机器人小车</a>
+        <a href="https://github.com/ZZDR1023" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="detail-hero" data-reveal>
+        <p class="eyebrow"><a href="/blog/" style="color: inherit; text-decoration: none;">← 返回博客列表</a> · POST / WORKFLOW</p>
+        <h1>我的 AI 辅助研发工作流：如何用 Claude Code / Codex 驱动全栈与机器人工程</h1>
+        <div class="article-meta" style="margin-top: 1rem;">
+          <span class="article-badge">工程实践</span>
+          <span>发布于 2026-03-12</span>
+          <span>·</span>
+          <span>预计阅读 5 分钟</span>
+          <span>·</span>
+          <span>作者：张瀚 (ZZDR1023)</span>
+        </div>
+        <div class="tag-row" style="margin-top: 1.2rem;">
+          <span>Claude Code</span>
+          <span>Codex</span>
+          <span>ROS1</span>
+          <span>Linux Engineering</span>
+          <span>Prompt Workflow</span>
+        </div>
+      </section>
+
+      <div class="post-layout">
+        <!-- 正文主体 -->
+        <article class="post-main" data-reveal>
+          <div class="post-body">
+            <h2 id="mindset">一、观念转变：AI 辅助开发不是“偷懒”，而是“高阶工程编排”</h2>
+            <p>
+              许多人对 AI 辅助编程的理解还停留在“在浏览器里复制粘贴一段算法”或者“让模型帮我写个贪吃蛇”。然而在真实的复杂工程场景中——例如联调带有激光雷达的 ROS 机器人小车、跨平台 Serverless 部署、多模态医疗数据归一化处理——模型直接吐出的代码往往充满各种看似合理但无法直接运行的细节缺陷。
+            </p>
+            <p>
+              我把自己的核心角色定位为<strong>“工程架构师与验收员”</strong>，而 <strong>Claude Code / Codex</strong> 是我最得力的结对编程副驾驶。要想让 AI 稳定产出生产级代码，关键不在于 Prompt 堆砌了多少优美修饰词，而在于<strong>精准的上下文供给与契约化需求拆解</strong>。
+            </p>
+
+            <h2 id="contract-first">二、核心原则 1：契约优先（Contract First）</h2>
+            <p>
+              在向 AI 发出编码指令前，先用纯文本、类型定义（TypeScript interfaces）或 JSON Schema 明确输入与输出契约。
+            </p>
+            <div class="code-block">
+              <div class="code-header">
+                <span>markdown // 契约示例</span>
+                <button class="copy-btn">复制代码</button>
+              </div>
+              <pre><code>[目标]：编写 ROS 与 Web 端通信的 WebSocket 网关中间件
+[输入]：从 ROS topic `/odom` 读取里程计数据（nav_msgs/Odometry）
+[输出]：序列化为精简 JSON 广播到所有已连接的客户端
+[非功能约束]：
+- 采样率限制在 10Hz，避免局域网拥堵
+- 客户端断开连接时不阻塞 ROS 主循环
+- 必须包含优雅退出（SIGINT 处理）</code></pre>
+            </div>
+            <p>
+              当你把边界条件、异常分支和性能约束提前在契约里锁死时，AI 交付高质量代码的成功率会直接从 40% 跃升到 90% 以上。
+            </p>
+
+            <h2 id="context-pruning">三、核心原则 2：上下文剪裁（Context Pruning）</h2>
+            <p>
+              大模型的上下文窗口虽然越来越大，但“大海捞针”和“指令衰减”依然存在。在大型项目或 Linux 联调时，我严守两条铁律：
+            </p>
+            <ul>
+              <li><strong>给最小必须文件</strong>：只喂直接相关的模块接口定义，而不是把整个几万行项目一股脑塞入。</li>
+              <li><strong>结构化日志喂入</strong>：在调试 ROS 报错时，不直接复制 500 行终端刷屏输出，而是先通过 <code>grep -E "(ERROR|FATAL|WARN)"</code> 提取核心堆栈，并附上当前的 <code>rostopic info</code> 拓扑图。</li>
+            </ul>
+
+            <h2 id="robotics-case">四、真实硬核案例：ROS1 小车与 Linux 系统的远程排障</h2>
+            <p>
+              在做 <strong>XF-ROBOT-UCAR01 智能小车</strong> 的 Web 控制系统时，我曾遇到一个偶发的疑难杂症：小车在开启 Cartographer 激光雷达建图几分钟后，Python Flask 后端就无法接收到 WebSocket 控制心跳，导致小车紧急制动。
+            </p>
+            <p>
+              我协同 Claude Code 进行排查，制定了三步排错链：
+            </p>
+            <ol>
+              <li><strong>系统资源快照</strong>：AI 指导我使用 <code>top -b -n 1</code> 和 <code>dmesg -T</code> 抓取异常发生瞬间的 CPU 负载，发现 Cartographer 占满了嵌入式工控机的所有核心。</li>
+              <li><strong>线程调度隔离</strong>：AI 提出了使用 Linux <code>taskset</code> 绑定 CPU 亲和度以及调优 Python 异步事件循环（Eventlet）的方案，将建图算法与 Web 通信线程隔离开。</li>
+              <li><strong>守护进程自愈</strong>：通过编写规范的 <code>systemd</code> service 单元配置，实现服务异常自重启与日志统一轮转（Logrotate）。</li>
+            </ol>
+
+            <div class="callout success">
+              <div class="callout-title">🎯 效果收益</div>
+              <p>原本需要折腾两三天的 Linux 线程竞争与系统瓶颈问题，在结构化工程分析下，仅用 40 分钟便完成根因定位与修复。</p>
+            </div>
+
+            <h2 id="conclusion">五、写在最后</h2>
+            <p>
+              相比纯粹的单点写代码能力，未来的核心竞争力是<strong>“把 AI 能力、工程规范与真实物理硬件结合并打造成可落地产品的能力”</strong>。
+            </p>
+            <p>
+              让 AI 处理繁琐的语法样板与排错检索，人类专注在架构权衡、物理联调与产品体验上——这就是我追求并践行的现代工程之道。
+            </p>
+          </div>
+
+          <!-- 底部上一篇/下一篇导航 -->
+          <div class="post-footer-nav">
+            <a class="post-nav-card" href="/blog/posts/2026-03-ai-native-game-practice.html">
+              <span class="post-nav-label">上一篇推荐</span>
+              <span class="post-nav-title">← 从零构建 AI Native 移动端游戏</span>
+            </a>
+            <a class="post-nav-card" href="/blog/" style="text-align: right;">
+              <span class="post-nav-label">目录</span>
+              <span class="post-nav-title">查看所有文章列表 →</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- 右侧边栏：大纲 TOC 与作者卡 -->
+        <aside class="post-sidebar" data-reveal>
+          <div class="toc-card">
+            <div class="toc-title">目录大纲 (TOC)</div>
+            <ul class="toc-list">
+              <li><a class="toc-link is-active" href="#mindset">一、观念转变：高阶工程编排</a></li>
+              <li><a class="toc-link" href="#contract-first">二、原则 1：契约优先</a></li>
+              <li><a class="toc-link" href="#context-pruning">三、原则 2：上下文剪裁</a></li>
+              <li><a class="toc-link" href="#robotics-case">四、真实案例：ROS 小车排障</a></li>
+              <li><a class="toc-link" href="#conclusion">五、写在最后</a></li>
+            </ul>
+          </div>
+
+          <div class="metric-card" style="margin: 0;">
+            <span>Author</span>
+            <strong>张瀚 / ZZDR1023</strong>
+            <p style="font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem; line-height: 1.5;">
+              关注 AI Native、Serverless 与 ROS 机器人系统。
+            </p>
+            <a class="button primary" href="https://github.com/ZZDR1023" target="_blank" rel="noreferrer" style="margin-top: 0.8rem; width: 100%; text-align: center;">Follow on GitHub</a>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer" data-reveal>
+      <p>© 2026 张瀚 / ZZDR1023 · 保持构建，保持好奇</p>
+      <div>
+        <a href="/blog/">Blog</a>
+        <a href="https://github.com/ZZDR1023" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="#">Back to top ↑</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="/js/portfolio.js"></script>
+</body>
+</html>
